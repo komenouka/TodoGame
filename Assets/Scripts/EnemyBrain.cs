@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyTurnProcessor
+public class EnemyBrain
 {
     private PlayerModel playerModel;
     private BattleView battleView;
 
-    public EnemyTurnProcessor(PlayerModel pModel, BattleView view)
+    public EnemyBrain(PlayerModel pModel, BattleView view)
     {
         playerModel = pModel;
         battleView = view;
@@ -17,12 +17,15 @@ public class EnemyTurnProcessor
     {
         foreach (EnemyView enemyView in enemies)
         {
-            EnemyModel status = enemyView.currentEnemyModel;
-            if (playerModel.IsDead || status.IsDead) continue;
+            EnemyModel enemyattacker = enemyView.currentEnemyModel;
+            
+            if (playerModel.IsDead || enemyattacker.IsDead) continue;
 
-            battleView.UpdateLog($"{status.name}の攻撃！");
+            battleView.UpdateLog($"[{enemyattacker.name}]ttacks!");
+
             playerModel.Damage(10);
-            battleView.UpdateLog("プレイヤーは10のダメージを受けた！");
+            battleView.UpdateLog("Player took 10 damage!");
+
             yield return new WaitForSeconds(0.8f);
         }
 

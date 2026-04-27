@@ -2,16 +2,11 @@ public class PlayerModel : UnitModel
 {
     public int mp;
     public int maxMp;
-    public int level;
-    public int exp;
+    public int level = 1;
+    public int exp = 0;
 
-    public PlayerModel(int hp, int mp)
+    public PlayerModel(string name, int hp, int mp) : base(name, hp)
     {
-        this.maxHp = hp;
-        this.hp = hp;
-        this.maxMp = mp;
-        this.mp = mp;
-        this.level = 1;
-        this.exp = 0;
+        this.maxMp = this.mp = mp;
     }
 }

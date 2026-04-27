@@ -4,30 +4,33 @@ using System.Collections.Generic;
 
 public class BattleController : MonoBehaviour
 {
+    
     public PlayerView playerView;
     public List<EnemyView> enemyViews;
     public BattleView battleView;
 
     private PlayerModel playerModel;
-    private PlayerTurnProcessor playerProcessor;
-    private EnemyTurnProcessor enemyProcessor;
+    private PlayerBrain playerProcessor;
+    private EnemyBrain enemyProcessor;
     private bool isProcessing;
 
-    private PlayerModel _player;
+    private void Start()
+    {
+        InitializeBattle(); 
+    }
 
     private void InitializeBattle()
     {
-        _player = new PlayerModel("プレイヤー", 100, 50);
-        playerModel = _player;
+        playerModel = new PlayerModel("Player", 100, 50);
 
-        playerProcessor = new PlayerTurnProcessor(playerModel, battleView);
-        enemyProcessor = new EnemyTurnProcessor(playerModel, battleView);
+        playerProcessor = new PlayerBrain(playerModel, battleView);
+        enemyProcessor = new EnemyBrain(playerModel, battleView);
 
         List<EnemyModel> initialEnemies = new List<EnemyModel>
         {
-            new EnemyModel("スライムA", 50),
-            new EnemyModel("スライムB", 50),
-            new EnemyModel("スライムC", 50)
+            new EnemyModel("SlimeA", 50,10),
+            new EnemyModel("SlimeB", 50,10),
+            new EnemyModel("SlimeC", 50,10)
         };
 
         for (int index = 0; index < enemyViews.Count; index++)
@@ -54,11 +57,11 @@ public class BattleController : MonoBehaviour
     {
         if (CheckVictory())
         {
-            battleView.UpdateLog("勝利！");
+            battleView.UpdateLog("Victory!");
         }
         else if (playerModel.IsDead)
         {
-            battleView.UpdateLog("敗北！");
+            battleView.UpdateLog("Lose...");
         }
         else
         {
@@ -72,7 +75,7 @@ public class BattleController : MonoBehaviour
 
     private void UpdateAllViews()
     {
-        playerView.UpdatePlayerUI(_player);
+        playerView.UpdatePlayerUI(playerModel);
         foreach (var ev in enemyViews) ev.UpdateEnemyUI();
     }
 

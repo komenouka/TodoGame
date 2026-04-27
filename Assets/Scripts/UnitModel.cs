@@ -25,28 +25,3 @@ public abstract class UnitModel
         hp = Mathf.Min(maxHp, hp + amount);
     }
 }
-
-public class PlayerStatus : UnitModel
-{
-    public int mp;
-    public int maxMp;
-    public int level;
-    public int exp;
-
-    public PlayerStatus(int hp, int mp) : base("プレイヤー", hp)
-    {
-        this.maxMp = this.mp = mp;
-        this.level = 1;
-        this.exp = 0;
-    }
-}
-
-public class EnemyStatus : UnitModel
-{
-    public string enemyName;
-
-    public EnemyStatus(string name, int hp) : base(name, hp)
-    {
-        this.enemyName = name;
-    }
-}

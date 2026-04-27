@@ -10,7 +10,7 @@ public class PlayerView : MonoBehaviour
     public TextMeshProUGUI mpText;
     public TextMeshProUGUI levelText;
 
-    public void UpdatePlayerUI(PlayerStatus status)
+    public void UpdatePlayerUI(PlayerModel status)
     {
         hpSlider.maxValue = status.maxHp;
         hpSlider.value = status.hp;

@@ -1,8 +1,9 @@
 public class EnemyModel : UnitModel
 {
-    public EnemyModel(string name, int hp)
+    public int rewardExp;
+
+    public EnemyModel(string name, int hp, int exp) : base(name, hp)
     {
-        this.maxHp = hp;
-        this.hp = hp;
+        this.rewardExp = exp;
     }
 }

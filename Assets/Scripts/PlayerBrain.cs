@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerTurnProcessor
+public class PlayerBrain
 {
     private PlayerModel playerStatus;
     private BattleView battleView;
 
-    public PlayerTurnProcessor(PlayerModel status, BattleView view)
+    public PlayerBrain(PlayerModel status, BattleView view)
     {
         playerStatus = status;
         battleView = view;
@@ -18,7 +18,7 @@ public class PlayerTurnProcessor
         
         EnemyModel enemy = target.currentEnemyModel;
         enemy.Damage(25);
-        battleView.UpdateLog($"{enemy.name}に25のダメージ！");
+        battleView.UpdateLog($"{enemy.name} took 25 damage!");
 
         yield return new WaitForSeconds(1.0f);
         onComplete?.Invoke();
