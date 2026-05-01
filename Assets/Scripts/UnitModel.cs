@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 public abstract class UnitModel
 {
@@ -17,11 +17,11 @@ public abstract class UnitModel
     public virtual void Damage(int amount)
     {
         int finalDamage = isGuarding ? amount / 2 : amount;
-        hp = Mathf.Max(0, hp - finalDamage);
+        hp = Math.Max(0, hp - finalDamage);
     }
 
     public void Heal(int amount)
     {
-        hp = Mathf.Min(maxHp, hp + amount);
+        hp = Math.Min(maxHp, hp + amount);
     }
 }

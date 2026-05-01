@@ -12,15 +12,12 @@ public class PlayerBrain
         battleView = view;
     }
 
-    public IEnumerator ExecuteAttack(EnemyView target, System.Action onComplete)
+    public IEnumerator ExecuteAttack(EnemyView target)
     {
         playerStatus.isGuarding = false;
-        
         EnemyModel enemy = target.currentEnemyModel;
         enemy.Damage(25);
         battleView.UpdateLog($"{enemy.name} took 25 damage!");
-
         yield return new WaitForSeconds(1.0f);
-        onComplete?.Invoke();
     }
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public class BattleController : MonoBehaviour
 {
-    
     public PlayerView playerView;
     public List<EnemyView> enemyViews;
     public BattleView battleView;
@@ -13,24 +12,24 @@ public class BattleController : MonoBehaviour
     private PlayerBrain playerProcessor;
     private EnemyBrain enemyProcessor;
     private bool isProcessing;
+    private bool isSelectingTarget;
 
     private void Start()
     {
-        InitializeBattle(); 
+        InitializeBattle();
     }
 
     private void InitializeBattle()
     {
         playerModel = new PlayerModel("Player", 100, 50);
-
         playerProcessor = new PlayerBrain(playerModel, battleView);
-        enemyProcessor = new EnemyBrain(playerModel, battleView);
+        enemyProcessor = new EnemyBrain(playerModel, battleView, this);
 
         List<EnemyModel> initialEnemies = new List<EnemyModel>
         {
-            new EnemyModel("SlimeA", 50,10),
-            new EnemyModel("SlimeB", 50,10),
-            new EnemyModel("SlimeC", 50,10)
+            new EnemyModel("SlimeA", 50, 10),
+            new EnemyModel("SlimeB", 50, 10),
+            new EnemyModel("SlimeC", 50, 10)
         };
 
         for (int index = 0; index < enemyViews.Count; index++)
@@ -42,38 +41,46 @@ public class BattleController : MonoBehaviour
         TogglePlayerControl(true);
     }
 
-    private void OnEnemyClicked(EnemyView clickedEnemyView)
+    public void OnAttackCommandSelected()
     {
-        if (isProcessing || clickedEnemyView.currentEnemyModel.IsDead) return;
-        
-        TogglePlayerControl(false);
-        StartCoroutine(playerProcessor.ExecuteAttack(clickedEnemyView, () => {
-            UpdateAllViews();
-            CheckBattleProgress();
-        }));
+        if (isProcessing) return;
+        isSelectingTarget = true;
+        battleView.UpdateLog("Select a target");
     }
 
-    private void CheckBattleProgress()
+    private void OnEnemyClicked(EnemyView clickedEnemyView)
     {
+        if (isProcessing || !isSelectingTarget || clickedEnemyView.currentEnemyModel.IsDead) return;
+        isSelectingTarget = false;
+        StartCoroutine(BattleSequence(clickedEnemyView));
+    }
+
+    private IEnumerator BattleSequence(EnemyView target)
+    {
+        TogglePlayerControl(false);
+
+        yield return playerProcessor.ExecuteAttack(target);
+        UpdateAllViews();
+
         if (CheckVictory())
         {
             battleView.UpdateLog("Victory!");
+            yield break;
         }
-        else if (playerModel.IsDead)
+
+        yield return StartCoroutine(enemyProcessor.ExecuteTurn(enemyViews, null));
+
+        if (playerModel.IsDead)
         {
             battleView.UpdateLog("Lose...");
         }
         else
         {
-            StartCoroutine(enemyProcessor.ExecuteTurn(enemyViews, () => {
-                UpdateAllViews();
-                if (playerModel.IsDead) CheckBattleProgress();
-                else TogglePlayerControl(true);
-            }));
+            TogglePlayerControl(true);
         }
     }
 
-    private void UpdateAllViews()
+    public void UpdateAllViews()
     {
         playerView.UpdatePlayerUI(playerModel);
         foreach (var ev in enemyViews) ev.UpdateEnemyUI();
