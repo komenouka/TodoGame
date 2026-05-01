@@ -55,6 +55,36 @@ public class BattleController : MonoBehaviour
         StartCoroutine(BattleSequence(clickedEnemyView));
     }
 
+    public void OnFireballCommandSelected()
+    {
+        if (isProcessing || playerModel.mp < 18) return;
+        StartCoroutine(FireballSequence());
+    }
+
+    private IEnumerator FireballSequence()
+    {
+        TogglePlayerControl(false);
+        yield return playerProcessor.ExecuteFireball(enemyViews);
+        UpdateAllViews();
+
+        if (CheckVictory())
+        {
+            battleView.UpdateLog("Victory!");
+            yield break;
+        }
+
+        yield return StartCoroutine(enemyProcessor.ExecuteTurn(enemyViews, null));
+
+        if (playerModel.IsDead)
+        {
+            battleView.UpdateLog("Lose...");
+        }
+        else
+        {
+            TogglePlayerControl(true);
+        }
+    }
+
     private IEnumerator BattleSequence(EnemyView target)
     {
         TogglePlayerControl(false);
@@ -95,5 +125,5 @@ public class BattleController : MonoBehaviour
     private bool CheckVictory()
     {
         return enemyViews.Find(e => !e.currentEnemyModel.IsDead) == null;
-    }
+    }    
 }
