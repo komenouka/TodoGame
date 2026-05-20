@@ -3,34 +3,44 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 
-public class EnemyView : MonoBehaviour
+public interface IEnemyView
 {
-    public Slider hpSlider;
-    public TextMeshProUGUI hpText;
-    public GameObject enemyVisual;
-    public Button targetButton;
+    void Setup(EnemyModel model, Action<EnemyModel> onClickCallback);
+    void UpdateEnemyUI(string enemyName, int hp, int maxHp, bool isDead);
+}
 
-    public EnemyModel currentEnemyModel;
-    public Action<EnemyView> OnTargetSelected;
+public class EnemyView : MonoBehaviour, IEnemyView
+{
+    [SerializeField] private Slider hpSlider;
+    [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private GameObject enemyVisual;
+    [SerializeField] private Button targetButton;
 
-    public void Setup(EnemyModel models, Action<EnemyView> callback)
+    private EnemyModel _associatedModel;
+    private Action<EnemyModel> _onClickCallback;
+
+    public void Setup(EnemyModel model, Action<EnemyModel> onClickCallback)
     {
-        currentEnemyModel = models;
-        OnTargetSelected = callback;
+        _associatedModel = model;
+        _onClickCallback = onClickCallback;
+
         targetButton.onClick.RemoveAllListeners();
-        targetButton.onClick.AddListener(() => OnTargetSelected?.Invoke(this));
+        targetButton.onClick.AddListener(() => _onClickCallback?.Invoke(_associatedModel));
     }
 
-    public void UpdateEnemyUI()
+    public void UpdateEnemyUI(string enemyName, int hp, int maxHp, bool isDead)
     {
-        if (currentEnemyModel.IsDead)
+        if (isDead)
         {
             enemyVisual.SetActive(false);
             targetButton.interactable = false;
             return;
         }
-        hpSlider.maxValue = currentEnemyModel.maxHp;
-        hpSlider.value = currentEnemyModel.hp;
-        hpText.text = $"{currentEnemyModel.name}\nHP: {currentEnemyModel.hp}";
+        enemyVisual.SetActive(true);
+        targetButton.interactable = true;
+
+        hpSlider.maxValue = maxHp;
+        hpSlider.value = hp;
+        hpText.text = $"{enemyName}\nHP: {hp}";
     }
 }

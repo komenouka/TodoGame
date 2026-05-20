@@ -4,46 +4,44 @@ using UnityEngine;
 
 public class PlayerBrain
 {
-    private PlayerModel playerStatus;
-    private BattleView battleView;
+    private readonly PlayerModel _playerStatus;
+    private readonly IBattlePresenter _presenter;
 
-    public PlayerBrain(PlayerModel status, BattleView view)
+    public PlayerBrain(PlayerModel status, IBattlePresenter presenter)
     {
-        playerStatus = status;
-        battleView = view;
+        _playerStatus = status;
+        _presenter = presenter;
     }
 
-    public IEnumerator ExecuteAttack(EnemyView target)
+    public IEnumerator ExecuteAttack(EnemyModel enemyTarget)
     {
-        playerStatus.isGuarding = false;
-        EnemyModel enemy = target.currentEnemyModel;
-        enemy.Damage(25);
-        battleView.UpdateLog($"{enemy.name} took 25 damage!");
+        _playerStatus.isGuarding = false;
+        enemyTarget.Damage(25);
+        _presenter.DisplayLog($"{enemyTarget.name} took 25 damage!");
         yield return new WaitForSeconds(1.0f);
     }
 
-    public IEnumerator ExecuteFireball(List<EnemyView> targets)
+    public IEnumerator ExecuteFireball(List<EnemyModel> targets)
     {
-        int cost = 18;
-        if (playerStatus.mp < cost)
+        int cost = 25;
+        if (_playerStatus.mp < cost)
         {
-            battleView.UpdateLog("No MP!");
+            _presenter.DisplayLog("No MP!");
             yield return new WaitForSeconds(1.0f);
             yield break;
         }
 
-
-        playerStatus.mp -= cost;
-        battleView.UpdateLog("Fireball! All enemies take 25 damage!");
+        _playerStatus.mp -= cost;
+        _presenter.DisplayLog("Fireball! All enemies take 25 damage!");
         yield return new WaitForSeconds(1.0f);
 
-        foreach (var target in targets)
+        foreach (var enemy in targets)
         {
-            if (!target.currentEnemyModel.IsDead)
+            if (!enemy.IsDead)
             {
-                target.currentEnemyModel.Damage(25);
+                enemy.Damage(10);
             }
         }
-    yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(1.0f);
     }
 }

@@ -1,11 +1,16 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 
-public class BattleView : MonoBehaviour
+public interface IBattleView
 {
-    public TextMeshProUGUI logText;
-    public CanvasGroup commandGroup;
+    void UpdateLog(string message);
+    void SetCommandInteractable(bool state);
+}
+
+public class BattleView : MonoBehaviour, IBattleView
+{
+    [SerializeField] private TextMeshProUGUI logText;
+    [SerializeField] private CanvasGroup commandGroup;
 
     public void UpdateLog(string message)
     {

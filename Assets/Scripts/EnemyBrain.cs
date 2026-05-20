@@ -4,30 +4,27 @@ using UnityEngine;
 
 public class EnemyBrain
 {
-    private PlayerModel playerModel;
-    private BattleView battleView;
-    private BattleController controller;
+    private readonly PlayerModel _playerModel;
+    private readonly IBattlePresenter _presenter;
 
-    public EnemyBrain(PlayerModel pModel, BattleView view, BattleController ctrl)
+    public EnemyBrain(PlayerModel pModel, IBattlePresenter presenter)
     {
-        playerModel = pModel;
-        battleView = view;
-        controller = ctrl;
+        _playerModel = pModel;
+        _presenter = presenter;
     }
 
-    public IEnumerator ExecuteTurn(List<EnemyView> enemies, System.Action onComplete)
+    public IEnumerator ExecuteTurn(List<EnemyModel> enemies, System.Action onComplete)
     {
-        foreach (EnemyView enemyView in enemies)
+        foreach (EnemyModel enemyattacker in enemies)
         {
-            EnemyModel enemyattacker = enemyView.currentEnemyModel;
-            if (playerModel.IsDead || enemyattacker.IsDead) continue;
+            if (_playerModel.IsDead || enemyattacker.IsDead) continue;
 
-            battleView.UpdateLog($"{enemyattacker.name} attacks!");
+            _presenter.DisplayLog($"{enemyattacker.name} attacks!");
             yield return new WaitForSeconds(0.5f);
 
-            playerModel.Damage(10);
-            controller.UpdateAllViews();
-            battleView.UpdateLog("Player took 10 damage!");
+            _playerModel.Damage(10);
+            _presenter.RefreshUI();
+            _presenter.DisplayLog("Player took 10 damage!");
 
             yield return new WaitForSeconds(0.8f);
         }
